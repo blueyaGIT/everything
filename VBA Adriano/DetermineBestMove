@@ -1,0 +1,113 @@
+Function DetermineBestMove() As Integer
+    Dim column As Integer
+    
+    ' Check if the bot can win with one move
+    For column = 1 To 7
+        If IsValidMove(column) Then
+            If IsWinningMove(column, currentPlayer) Then
+                DetermineBestMove = column
+                Exit Function
+            End If
+        End If
+    Next column
+    
+    ' Check if the opponent can win with one move and block it
+    For column = 1 To 7
+        If IsValidMove(column) Then
+            If IsWinningMove(column, 3 - currentPlayer) Then
+                DetermineBestMove = column
+                Exit Function
+            End If
+        End If
+    Next column
+    
+    ' Fallback: Choose the first valid move
+    For column = 1 To 7
+        If IsValidMove(column) Then
+            DetermineBestMove = column
+            Exit Function
+        End If
+    Next column
+End Function
+
+Function IsValidMove(column As Integer) As Boolean
+    ' Check if the top cell in the column is empty
+    IsValidMove = (board(1, column) = 0)
+End Function
+
+Function IsWinningMove(column As Integer, player As Integer) As Boolean
+    Dim row As Integer
+    Dim tempBoard(6, 7) As Integer
+    Dim i As Integer, j As Integer
+    
+    ' Copy the current board to a temporary board
+    For i = 1 To 6
+        For j = 1 To 7
+            tempBoard(i, j) = board(i, j)
+        Next j
+    Next i
+    
+    ' Find the first empty row in the column
+    For row = 6 To 1 Step -1
+        If tempBoard(row, column) = 0 Then
+            tempBoard(row, column) = player
+            Exit For
+        End If
+    Next row
+    
+    ' Check if this move wins the game
+    IsWinningMove = CheckWinForPlayer(tempBoard, player)
+End Function
+
+Function CheckWinForPlayer(tempBoard() As Integer, player As Integer) As Boolean
+    Dim row As Integer, col As Integer
+    Dim i As Integer
+
+    ' Check horizontal
+    For row = 1 To 6
+        For col = 1 To 4
+            If tempBoard(row, col) = player And tempBoard(row, col + 1) = player And _
+               tempBoard(row, col + 2) = player And tempBoard(row, col + 3) = player Then
+                CheckWinForPlayer = True
+                Exit Function
+            End If
+        Next col
+    Next row
+
+    ' Check vertical
+    For col = 1 To 7
+        For row = 1 To 3
+            If tempBoard(row, col) = player And tempBoard(row + 1, col) = player And _
+               tempBoard(row + 2, col) = player And tempBoard(row + 3, col) = player Then
+                CheckWinForPlayer = True
+                Exit Function
+            End If
+        Next row
+    Next col
+
+    ' Check diagonal (\)
+    For row = 1 To 3
+        For col = 1 To 4
+            If tempBoard(row, col) = player And tempBoard(row + 1, col + 1) = player And _
+               tempBoard(row + 2, col + 2) = player And tempBoard(row + 3, col + 3) = player Then
+                CheckWinForPlayer = True
+                Exit Function
+            End If
+        Next col
+    Next row
+
+    ' Check diagonal (/)
+    For row = 4 To 6
+        For col = 1 To 4
+            If tempBoard(row, col) = player And tempBoard(row - 1, col + 1) = player And _
+               tempBoard(row - 2, col + 2) = player And tempBoard(row - 3, col + 3) = player Then
+                CheckWinForPlayer = True
+                Exit Function
+            End If
+        Next col
+    Next row
+
+    CheckWinForPlayer = False
+End Function
+
+

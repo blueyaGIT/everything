@@ -1,0 +1,143 @@
+' File Path: Connect4.xlsm
+Option Explicit
+
+Dim board(1 To 8, 1 To 8) As String
+Dim currentPlayer As String
+
+Sub InitializeGame()
+    Dim i As Integer, j As Integer
+    currentPlayer = "R" ' R for Red, Y for Yellow
+    For i = 1 To 8
+        For j = 1 To 8
+            board(i, j) = ""
+            With Cells(i + 1, j)
+                .Interior.ColorIndex = xlNone
+                .Value = ""
+            End With
+        Next j
+    Next i
+    MsgBox "Game Initialized! Red goes first."
+End Sub
+
+Sub DropDisc(column As Integer)
+    Dim row As Integer
+    row = GetEmptyRow(column)
+    If row = 0 Then
+        MsgBox "Column is full! Choose another column."
+        Exit Sub
+    End If
+    
+    board(row, column) = currentPlayer
+    With Cells(row + 1, column)
+        If currentPlayer = "R" Then
+            .Interior.Color = RGB(255, 0, 0) ' Red
+            currentPlayer = "Y"
+        Else
+            .Interior.Color = RGB(255, 255, 0) ' Yellow
+            currentPlayer = "R"
+        End If
+    End With
+    
+    If CheckForWin(row, column) Then
+        MsgBox "Player " & board(row, column) & " wins!"
+        InitializeGame
+    ElseIf IsBoardFull Then
+        MsgBox "It's a draw!"
+        InitializeGame
+    End If
+End Sub
+
+Function GetEmptyRow(column As Integer) As Integer
+    Dim row As Integer
+    For row = 8 To 1 Step -1
+        If board(row, column) = "" Then
+            GetEmptyRow = row
+            Exit Function
+        End If
+    Next row
+    GetEmptyRow = 0 ' Column is full
+End Function
+
+Function CheckForWin(row As Integer, column As Integer) As Boolean
+    If CheckDirection(row, column, 1, 0) >= 4 Or _
+       CheckDirection(row, column, 0, 1) >= 4 Or _
+       CheckDirection(row, column, 1, 1) >= 4 Or _
+       CheckDirection(row, column, 1, -1) >= 4 Then
+        CheckForWin = True
+    Else
+        CheckForWin = False
+    End If
+End Function
+Function CheckDirection(row As Integer, column As Integer, deltaRow As Integer, deltaColumn As Integer) As Integer
+    Dim count As Integer, r As Integer, c As Integer
+    count = 1
+    r = row + deltaRow
+    c = column + deltaColumn
+    While r >= 1 And r <= 8 And c >= 1 And c <= 8
+        If board(r, c) = board(row, column) Then
+            count = count + 1
+        Else
+            Exit While
+        End If
+        r = r + deltaRow
+        c = c + deltaColumn
+    Wend
+    r = row - deltaRow
+    c = column - deltaColumn
+    While r >= 1 And r <= 8 And c >= 1 And c <= 8
+        If board(r, c) = board(row, column) Then
+            count = count + 1
+        Else
+            Exit While
+        End If
+        r = r - deltaRow
+        c = c - deltaColumn
+    Wend
+    CheckDirection = count
+End Function
+Function IsBoardFull() As Boolean
+    Dim i As Integer, j As Integer
+    For i = 1 To 8
+        For j = 1 To 8
+            If board(i, j) = "" Then
+                IsBoardFull = False
+                Exit Function
+            End If
+        Next j
+    Next i
+    IsBoardFull = True
+End Function
+
+Sub DropDiscInColumn1()
+    DropDisc 1
+End Sub
+
+Sub DropDiscInColumn2()
+    DropDisc 2
+End Sub
+
+Sub DropDiscInColumn3()
+    DropDisc 3
+End Sub
+
+Sub DropDiscInColumn4()
+    DropDisc 4
+End Sub
+
+Sub DropDiscInColumn5()
+    DropDisc 5
+End Sub
+
+Sub DropDiscInColumn6()
+    DropDisc 6
+End Sub
+
+Sub DropDiscInColumn7()
+    DropDisc 7
+End Sub
+
+Sub DropDiscInColumn8()
+    DropDisc 8
+End Sub
+
+
